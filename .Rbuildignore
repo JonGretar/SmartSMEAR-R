@@ -3,5 +3,8 @@
 ^LICENSE\.md$
 ^.rules$
 ^smear_api.yml$
+^api_docs$
+^justfile$
+^.radian_profile$
 ^doc$
 ^Meta$
