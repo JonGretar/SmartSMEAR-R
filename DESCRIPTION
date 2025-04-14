@@ -23,5 +23,8 @@ Imports:
     utils
 Suggests:
     testthat (>= 3.0.0),
-    mockery (>= 0.4.0)
+    mockery (>= 0.4.0),
+    knitr,
+    rmarkdown
 Config/testthat/edition: 3
+VignetteBuilder: knitr

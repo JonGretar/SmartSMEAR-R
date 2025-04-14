@@ -3,3 +3,5 @@
 ^LICENSE\.md$
 ^.rules$
 ^smear_api.yml$
+^doc$
+^Meta$
