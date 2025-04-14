@@ -16,3 +16,4 @@ A data frame with added east, north, and elevation columns
 This function parses the dcmiPoint string from station data to extract
 coordinates and elevation information into separate columns
 }
+\keyword{internal}

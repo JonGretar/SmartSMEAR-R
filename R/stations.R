@@ -34,6 +34,7 @@ search_stations <- function(station = NULL, name = NULL) {
 #'
 #' @param stations A data frame containing SMEAR station information with a dcmiPoint column
 #' @return A data frame with added east, north, and elevation columns
+#' @keywords internal
 parse_station_coordinates <- function(stations) {
   if (!'dcmiPoint' %in% names(stations)) {
     stop("Input data frame must contain a 'dcmiPoint' column")
