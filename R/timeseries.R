@@ -91,15 +91,12 @@ get_timeseries <- function(
   }
 
   # Build query parameters
-  params <- list(
-    tablevariable = paste(variables, collapse = ","),
-    from = format_timestamp(start_time),
-    to = format_timestamp(end_time)
-  )
-
+  params <- make_query_list("tablevariable", variables)
   params <- add_params(
     params,
     list(
+      from = format_timestamp(start_time),
+      to = format_timestamp(end_time),
       interval = if (!is.null(interval)) as.integer(interval) else NULL,
       aggregation = if (aggregation != "NONE") aggregation else NULL,
       quality = quality,

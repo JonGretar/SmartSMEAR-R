@@ -132,3 +132,14 @@ add_params <- function(params, new_params) {
   }
   return(params)
 }
+
+#' Create a list with the same keyname for each value
+#' @param params The key to use
+#' @param variables List of variables
+#' @return Updated parameter list
+#' @keywords internal
+make_query_list <- function(keyname, variables) {
+  params <- rep(keyname, length(variables))
+  query_list <- setNames(as.list(variables), params)
+  query_list
+}
