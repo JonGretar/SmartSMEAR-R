@@ -21,7 +21,7 @@ stations <- get_stations()
 hyytiala_meta <- get_table_metadata("HYY_META")
 
 # Search for specific variables
-co2_vars <- search_variables(description = "PAR")
+par_vars <- search_variables(description = "PAR")
 
 # Get time series data
 data <- get_timeseries(
@@ -29,6 +29,16 @@ data <- get_timeseries(
   start_time = "2023-01-01 00:00:00",
   end_time = "2023-01-02 00:00:00"
 )
+
+# Result has a 'time' column in POSIXct format:
+head(data)
+#                    time    PAR
+# 1 2023-01-01 00:00:00   0.00
+# 2 2023-01-01 00:01:00   0.00
+# 3 2023-01-01 00:02:00   0.00
+# 4 2023-01-01 00:03:00   0.00
+# 5 2023-01-01 00:04:00   0.00
+# 6 2023-01-01 00:05:00   0.00
 ```
 
 ## Data Timing and Resolution
@@ -37,6 +47,7 @@ data <- get_timeseries(
 - Timestamps are in local standard time (UTC+2)
 - Timestamps indicate the beginning of measurement/aggregation interval
 - The API supports temporal aggregation between 1-60 minutes
+- Time values are returned as POSIXct in EET timezone
 
 ## Data Quality
 
@@ -64,6 +75,33 @@ hourly_data <- get_timeseries(
   interval = 60,
   aggregation = "ARITHMETIC"
 )
+
+head(hourly_data)
+#                    time    PAR
+# 1 2023-01-01 00:00:00   0.00
+# 2 2023-01-01 01:00:00   0.00
+# 3 2023-01-01 02:00:00   0.00
+# 4 2023-01-01 03:00:00   0.00
+# 5 2023-01-01 04:00:00   0.00
+# 6 2023-01-01 05:00:00   0.00
+```
+
+## Working with Time Data
+
+The time series data is returned with a `time` column that is already in POSIXct format with the correct timezone (EET). This makes it easy to use with time series analysis packages and plotting libraries:
+
+```R
+# Filter data for daytime only
+daytime <- subset(data, format(time, "%H") >= "06" & format(time, "%H") <= "18")
+
+# Get daily averages using base R
+daily_avg <- aggregate(PAR ~ as.Date(time), data = data, FUN = mean)
+
+# Or use with dplyr
+library(dplyr)
+daily_avg <- data %>%
+  group_by(date = as.Date(time)) %>%
+  summarize(PAR = mean(PAR))
 ```
 
 ## API Documentation
