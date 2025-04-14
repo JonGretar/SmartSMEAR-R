@@ -6,6 +6,7 @@ krlocal.R
 .DS_Store
 revdep/
 mykey.txt
+.rules
 
 inst/doc
 doc
