@@ -22,10 +22,11 @@ hyytiala_meta <- get_table_metadata("HYY_META")
 
 # Search for specific variables
 par_vars <- search_variables(description = "PAR")
+hyy_meta_vars <- search_variables(table = "HYY_META")
 
 # Get time series data
 data <- get_timeseries(
-  variables = c("HYY_META.PAR"),
+  variables = c("HYY_META.PAR", "HYY_META.PAR2", "HYY_META.NDVI"),
   start_time = "2023-01-01 00:00:00",
   end_time = "2023-01-02 00:00:00"
 )
@@ -69,10 +70,10 @@ Example with aggregation:
 ```R
 # Get hourly averages
 hourly_data <- get_timeseries(
-  variables = c("HYY_META.PAR"),
+  variables = c("HYY_META.PAR", "HYY_META.PAR2", "HYY_META.NDVI"),
   start_time = "2023-01-01 00:00:00",
   end_time = "2023-01-02 00:00:00",
-  interval = 60,
+  interval = 30,
   aggregation = "ARITHMETIC"
 )
 
