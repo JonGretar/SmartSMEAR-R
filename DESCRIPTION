@@ -1,0 +1,26 @@
+Package: SmartSMEAR
+Type: Package
+Title: R Interface to SmartSMEAR API
+Version: 0.1.0
+Authors@R:
+    person(given = "Jón Grétar",
+           family = "Borgþórsson",
+           role = c("aut", "cre"),
+           email = "jongretar@jongretar.com")
+Description: An R package for accessing the SmartSMEAR HTTP API. SmartSMEAR provides
+    continuous atmospheric, flux, soil, tree physiological and water quality
+    measurements from SMEAR research stations of the University of Helsinki and
+    the University of Eastern Finland.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Language: en-US
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports:
+    httr,
+    jsonlite,
+    utils
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
