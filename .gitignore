@@ -1,0 +1,12 @@
+.Rproj.user
+.Rhistory
+.RData
+krlocal.R
+/.Rapp.history
+.DS_Store
+revdep/
+mykey.txt
+
+inst/doc
+doc
+Meta
