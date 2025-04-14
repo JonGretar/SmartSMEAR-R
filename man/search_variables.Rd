@@ -16,25 +16,45 @@ search_variables(
 )
 }
 \arguments{
-\item{category}{Filter by variable category}
+\item{category}{Filter by variable category (e.g., "EDDY", "MET", "HYD")}
 
-\item{description}{Filter by variable description}
+\item{description}{Filter by variable description text}
 
 \item{source}{Filter by data source}
 
-\item{station}{Filter by station}
+\item{station}{Filter by station identifier (e.g., "HYY" for Hyytiälä)}
 
-\item{table}{Filter by table name}
+\item{table}{Filter by table name (e.g., "HYY_META")}
 
 \item{variable}{Filter by variable name}
 
-\item{tablevariable}{Filter by table.variable combination}
+\item{tablevariable}{Filter by table.variable combination (e.g., "HYY_META.CO2")}
 
 \item{format}{Response format ("json", "csv", or "tsv")}
 }
 \value{
-A data frame containing the search results
+A data frame containing matching variables with the following columns:
+\itemize{
+\item \code{variable} - Variable identifier
+\item \code{description} - Human-readable description of the variable
+\item \code{tableName} - Name of the table containing this variable
+\item \code{tableId} - Numeric identifier of the table
+\item \code{title} - Title of the variable
+\item \code{unit} - Measurement unit
+\item \code{source} - Data source identifier
+\item \code{category} - Variable category
+\item \code{periodStart} - Start of measurement period as POSIXct
+\item \code{periodEnd} - End of measurement period as POSIXct
+\item \code{timestamp} - Last update time as POSIXct
+\item \code{rights} - Data usage rights
+\item \code{identifier} - Unique identifier
+\item \code{type} - Data type
+\item \code{coverage} - Spatial coverage information
+\item \code{mandatory} - Whether the variable is mandatory
+}
 }
 \description{
-Search for variables in the SMEAR database using various filters
+Search for variables in the SMEAR database using various filters. Returns detailed
+information about each matching variable including its description, metadata,
+measurement periods, and quality indicators.
 }
