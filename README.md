@@ -6,7 +6,7 @@ An R package for accessing SmartSMEAR API data. SmartSMEAR is a data visualizati
 
 ```R
 # Install from GitHub:
-devtools::install_github("JonGretar/SmartSMEAR")
+devtools::install_github("JonGretar/SmartSMEAR-R")
 ```
 
 ## Basic Usage
