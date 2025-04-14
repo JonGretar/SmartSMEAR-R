@@ -1,0 +1,1041 @@
+---
+openapi: 3.0.3
+info:
+  title: SMEAR API
+  contact:
+    name: SMEAR API Support
+    email: servicedesk@csc.fi
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.1.1
+paths:
+  /aggregation:
+    get:
+      summary: Fetch aggregation type search optons for UI
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    $ref: '#/components/schemas/Serializable'
+  /quality:
+    get:
+      summary: Fetch quality type search options and their default values for the
+        UI
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  additionalProperties:
+                    $ref: '#/components/schemas/Serializable'
+  /search/event:
+    get:
+      summary: Fetch events by variable name
+      description: Returns a list of events linked to a variable. Events describe
+        changes in time series data. The event types in the SMEAR database are based
+        on DDI data lifecycle events and ENVRI reference model. The time range of
+        the event indicates the time frame when the event affects the data.
+      parameters:
+      - name: tablevariable
+        in: query
+        description: Name of a table and a variable separated by a period. Table and
+          variable names can be queried from the table and variable metadata endpoints.
+          Multiple parameters can be used and at least one is required.
+        required: true
+        schema:
+          minItems: 1
+          type: array
+          items:
+            type: string
+          nullable: false
+        example: HYY_META.Pamb0
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Event'
+  /search/metadata:
+    get:
+      summary: Fetch general info about the Smart SMEAR application
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Metadata'
+  /search/station:
+    get:
+      summary: Fetch list of all SMEAR stations
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Station'
+  /search/table:
+    get:
+      summary: Fetch all table metadata
+      description: Table metadata describes measuring stations (=database tables).
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TableMetadata'
+  /search/table/{name}:
+    get:
+      summary: Fetch table metadata by table name
+      description: Table metadata describes measuring stations (=database tables).
+      parameters:
+      - name: name
+        in: path
+        description: Name of a table in the SMEAR database.
+        required: true
+        schema:
+          type: string
+          nullable: false
+        example: HYY_META
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TableMetadata'
+  /search/tag:
+    get:
+      summary: Fetch tags by table and variable.
+      description: Returns tags linked to a SMEAR variable. Tags are keywords for
+        SMEAR variables. They are used to link variables/columns to vocabularies or
+        other standards.
+      parameters:
+      - name: tablevariable
+        in: query
+        description: Name of a table and a variable separated by a period. Table and
+          variable names can be queried from the table and variable metadata endpoints.
+          Multiple parameters can be used and at least one is required.
+        required: true
+        schema:
+          minItems: 1
+          type: array
+          items:
+            type: string
+          nullable: false
+        example: HYY_META.Pamb0
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tag'
+  /search/timeseries:
+    get:
+      summary: Fetch time series data stored in the SMEAR Database
+      description: Information about stored variables can be found via the Metadata
+        API or the graphical SMART SMEAR application.
+      parameters:
+      - name: aggregation
+        in: query
+        description: "Type of the sample time aggregation. Valid values: NONE (default),\
+          \ ARITHMETIC, GEOMETRIC, SUM, MEDIAN, MIN, MAX, CIRCULAR, AVAILABILITY.\
+          \ MEDIAN and CIRCULAR are not supported when querying HYY_SLOW or HYY_TREE\
+          \ table. AVAILABILITY returns integer value of hunderth of a percent of\
+          \ the available measurements with given criteria without considering specified\
+          \ interval value."
+        schema:
+          type: string
+        example: NONE
+      - name: cuv_no
+        in: query
+        description: cuv_no values in the SMEAR database. Multiple parameters can
+          be used. If not specified when querying HYY_TREE table all of the rows in
+          the given time interval are fetched.
+        schema:
+          type: array
+          items:
+            format: int32
+            type: integer
+      - name: from
+        in: query
+        description: Time series start time (inclusive) in ISO 8601 format (YYYY-MM-DDThh:mm:ss.mmm).
+        required: true
+        schema:
+          type: string
+          nullable: false
+        example: 2016-02-11T00:00:00.989
+      - name: interval
+        in: query
+        description: Sample time aggregation interval in minutes. Valid range is from
+          1 to 60.
+        schema:
+          format: int32
+          maximum: 60
+          minimum: 1
+          type: integer
+        example: 30
+      - name: quality
+        in: query
+        description: "Should the time series data be quality checked or not. Valid\
+          \ values: ANY (default), CHECKED."
+        schema:
+          type: string
+        example: ANY
+      - name: tablevariable
+        in: query
+        description: Name of a table and a variable separated by a period. Table and
+          variable names can be queried from the table metadata and variable metadata
+          endpoints. Multiple parameters can be used and at least one is required.
+          Variables in results may not be in the same order as in the query.
+        required: true
+        schema:
+          minItems: 1
+          type: array
+          items:
+            type: string
+      - name: to
+        in: query
+        description: Time series end time (exclusive) in ISO 8601 format (YYYY-MM-DDThh:mm:ss.mmm).
+        required: true
+        schema:
+          type: string
+          nullable: false
+        example: 2016-02-12T09:06:07.989
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TimeSeriesSheet'
+  /search/timeseries/chart:
+    get:
+      summary: Fetch time series data stored in the SMEAR Database as chart series
+      description: Information about stored variables can be found via the Metadata
+        API or the graphical SMART SMEAR application. This endpoint is mainly for
+        frontend use.
+      parameters:
+      - name: aggregation
+        in: query
+        description: "Type of the sample time aggregation. Valid values: NONE (default),\
+          \ ARITHMETIC, GEOMETRIC, SUM, MEDIAN, MIN, MAX, CIRCULAR, AVAILABILITY.\
+          \ MEDIAN and CIRCULAR are not supported when querying HYY_SLOW or HYY_TREE\
+          \ table. AVAILABILITY returns integer value of hunderth of a percent of\
+          \ the available measurements with given criteria without considering specified\
+          \ interval value."
+        schema:
+          type: string
+        example: NONE
+      - name: cuv_no
+        in: query
+        description: cuv_no values in the SMEAR database. Multiple parameters can
+          be used. If not specified when querying HYY_TREE table all of the rows in
+          the given time interval are fetched.
+        schema:
+          type: array
+          items:
+            format: int32
+            type: integer
+      - name: from
+        in: query
+        description: Time series start time (inclusive) in ISO 8601 format (YYYY-MM-DDThh:mm:ss.mmm).
+        required: true
+        schema:
+          type: string
+          nullable: false
+        example: 2016-02-11T00:00:00.989
+      - name: interval
+        in: query
+        description: Sample time aggregation interval in minutes. Valid range is from
+          1 to 60.
+        schema:
+          format: int32
+          maximum: 60
+          minimum: 1
+          type: integer
+        example: 30
+      - name: quality
+        in: query
+        description: "Should the time series data be quality checked or not. Valid\
+          \ values: ANY (default), CHECKED."
+        schema:
+          type: string
+        example: ANY
+      - name: tablevariable
+        in: query
+        description: Name of a table and a variable separated by a period. Table and
+          variable names can be queried from the table metadata and variable metadata
+          endpoints. Multiple parameters can be used and at least one is required.
+          Variables in results may not be in the same order as in the query.
+        required: true
+        schema:
+          minItems: 1
+          type: array
+          items:
+            type: string
+      - name: to
+        in: query
+        description: Time series end time (exclusive) in ISO 8601 format (YYYY-MM-DDThh:mm:ss.mmm).
+        required: true
+        schema:
+          type: string
+          nullable: false
+        example: 2016-02-12T09:06:07.989
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  type: array
+                  items:
+                    type: array
+                    items:
+                      type: number
+  /search/timeseries/csv:
+    get:
+      summary: "Fetch time series data stored in the SMEAR Database, CSV format"
+      description: Information about stored variables can be found via the Metadata
+        API or the graphical SMART SMEAR application.
+      parameters:
+      - name: aggregation
+        in: query
+        description: "Type of the sample time aggregation. Valid values: NONE (default),\
+          \ ARITHMETIC, GEOMETRIC, SUM, MEDIAN, MIN, MAX, CIRCULAR, AVAILABILITY.\
+          \ MEDIAN and CIRCULAR are not supported when querying HYY_SLOW or HYY_TREE\
+          \ table. AVAILABILITY returns integer value of hunderth of a percent of\
+          \ the available measurements with given criteria without considering specified\
+          \ interval value."
+        schema:
+          type: string
+        example: NONE
+      - name: cuv_no
+        in: query
+        description: cuv_no values in the SMEAR database. Multiple parameters can
+          be used. If not specified when querying HYY_TREE table all of the rows in
+          the given time interval are fetched.
+        schema:
+          type: array
+          items:
+            format: int32
+            type: integer
+      - name: from
+        in: query
+        description: Time series start time (inclusive) in ISO 8601 format (YYYY-MM-DDThh:mm:ss.mmm).
+        required: true
+        schema:
+          type: string
+          nullable: false
+        example: 2016-02-11T00:00:00.989
+      - name: interval
+        in: query
+        description: Sample time aggregation interval in minutes. Valid range is from
+          1 to 60.
+        schema:
+          format: int32
+          maximum: 60
+          minimum: 1
+          type: integer
+        example: 30
+      - name: quality
+        in: query
+        description: "Should the time series data be quality checked or not. Valid\
+          \ values: ANY (default), CHECKED."
+        schema:
+          type: string
+        example: ANY
+      - name: tablevariable
+        in: query
+        description: Name of a table and a variable separated by a period. Table and
+          variable names can be queried from the table metadata and variable metadata
+          endpoints. Multiple parameters can be used and at least one is required.
+          Variables in results may not be in the same order as in the query.
+        required: true
+        schema:
+          minItems: 1
+          type: array
+          items:
+            type: string
+      - name: to
+        in: query
+        description: Time series end time (exclusive) in ISO 8601 format (YYYY-MM-DDThh:mm:ss.mmm).
+        required: true
+        schema:
+          type: string
+          nullable: false
+        example: 2016-02-12T09:06:07.989
+      responses:
+        "200":
+          description: OK
+  /search/timeseries/tsv:
+    get:
+      summary: "Fetch time series data stored in the SMEAR Database, TSV format"
+      description: Information about stored variables can be found via Metadata API
+        or via the graphical SMART SMEAR application.
+      parameters:
+      - name: aggregation
+        in: query
+        description: "Type of the sample time aggregation. Valid values: NONE (default),\
+          \ ARITHMETIC, GEOMETRIC, SUM, MEDIAN, MIN, MAX, CIRCULAR, AVAILABILITY.\
+          \ MEDIAN and CIRCULAR are not supported when querying HYY_SLOW or HYY_TREE\
+          \ table. AVAILABILITY returns integer value of hunderth of a percent of\
+          \ the available measurements with given criteria without considering specified\
+          \ interval value."
+        schema:
+          type: string
+        example: NONE
+      - name: cuv_no
+        in: query
+        description: cuv_no values in the SMEAR database. Multiple parameters can
+          be used. If not specified when querying HYY_TREE table all of the rows in
+          the given time interval are fetched.
+        schema:
+          type: array
+          items:
+            format: int32
+            type: integer
+      - name: from
+        in: query
+        description: Time series start time (inclusive) in ISO 8601 format (YYYY-MM-DDThh:mm:ss.mmm).
+        required: true
+        schema:
+          type: string
+          nullable: false
+        example: 2016-02-11T00:00:00.989
+      - name: interval
+        in: query
+        description: Sample time aggregation interval in minutes. Valid range is from
+          1 to 60.
+        schema:
+          format: int32
+          maximum: 60
+          minimum: 1
+          type: integer
+        example: 30
+      - name: quality
+        in: query
+        description: "Should the time series data be quality checked or not. Valid\
+          \ values: ANY (default), CHECKED."
+        schema:
+          type: string
+        example: ANY
+      - name: tablevariable
+        in: query
+        description: Name of a table and a variable separated by a period. Table and
+          variable names can be queried from the table metadata and variable metadata
+          endpoints. Multiple parameters can be used and at least one is required.
+          Variables in results may not be in the same order as in the query.
+        required: true
+        schema:
+          minItems: 1
+          type: array
+          items:
+            type: string
+      - name: to
+        in: query
+        description: Time series end time (exclusive) in ISO 8601 format (YYYY-MM-DDThh:mm:ss.mmm).
+        required: true
+        schema:
+          type: string
+          nullable: false
+        example: 2016-02-12T09:06:07.989
+      responses:
+        "200":
+          description: OK
+  /search/variable:
+    get:
+      summary: Search variable metadata
+      description: Metadata that describes variables stored in the SMEAR database.
+      parameters:
+      - name: category
+        in: query
+        description: Name of a category in the SMEAR database. The parameter will
+          be used to do a case insensitive text search. Multiple parameters can be
+          used.
+        schema:
+          type: array
+          items:
+            type: string
+      - name: description
+        in: query
+        description: Description of the variable. The parameter will be used to do
+          a case insensitive text search. Multiple parameters can be used.
+        schema:
+          type: array
+          items:
+            type: string
+      - name: source
+        in: query
+        description: Source of the variable. The parameter will be used to do a case
+          insensitive text search. Multiple parameters can be used.
+        schema:
+          type: array
+          items:
+            type: string
+      - name: station
+        in: query
+        description: Name of a SMEAR station. The parameter will be used to do a case
+          insensitive text search. Multiple parameters can be used.
+        schema:
+          type: array
+          items:
+            type: string
+      - name: table
+        in: query
+        description: Name of the database table where variable data is stored in the
+          smear database. Table names can be found from the tablemetadata endpoint.
+          Multiple parameters can be used.
+        schema:
+          type: array
+          items:
+            type: string
+      - name: tablevariable
+        in: query
+        description: Name of a table and a variable separated by a period. Multiple
+          parameters can be used.
+        schema:
+          type: array
+          items:
+            type: string
+        example: HYY_META.Pamb0
+      - name: variable
+        in: query
+        description: Name of a variable in the SMEAR database. Multiple parameters
+          can be used.
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VariableMetadata'
+  /search/variable/csv:
+    get:
+      summary: "Search variable metadata, CSV format"
+      description: Metadata that describes variables stored in the SMEAR database.
+      parameters:
+      - name: category
+        in: query
+        description: Name of a category in the SMEAR database. The parameter will
+          be used to do a case insensitive text search. Multiple parameters can be
+          used.
+        schema:
+          type: array
+          items:
+            type: string
+      - name: description
+        in: query
+        description: Description of the variable. The parameter will be used to do
+          a case insensitive text search. Multiple parameters can be used.
+        schema:
+          type: array
+          items:
+            type: string
+      - name: source
+        in: query
+        description: Source of the variable. The parameter will be used to do a case
+          insensitive text search. Multiple parameters can be used.
+        schema:
+          type: array
+          items:
+            type: string
+      - name: station
+        in: query
+        description: Name of a SMEAR station. The parameter will be used to do a case
+          insensitive text search. Multiple parameters can be used.
+        schema:
+          type: array
+          items:
+            type: string
+      - name: table
+        in: query
+        description: Name of the database table where variable data is stored in the
+          smear database. Table names can be found from the tablemetadata endpoint.
+          Multiple parameters can be used.
+        schema:
+          type: array
+          items:
+            type: string
+      - name: tablevariable
+        in: query
+        description: Name of a table and a variable separated by a period. Multiple
+          parameters can be used.
+        schema:
+          type: array
+          items:
+            type: string
+        example: HYY_META.Pamb0
+      - name: variable
+        in: query
+        description: Name of a variable in the SMEAR database. Multiple parameters
+          can be used.
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            text/csv:
+              schema:
+                type: string
+  /search/variable/tsv:
+    get:
+      summary: "Search variable metadata, TSV format"
+      description: Metadata that describes variables stored in the SMEAR database.
+      parameters:
+      - name: category
+        in: query
+        description: Name of a category in the SMEAR database. The parameter will
+          be used to do a case insensitive text search. Multiple parameters can be
+          used.
+        schema:
+          type: array
+          items:
+            type: string
+      - name: description
+        in: query
+        description: Description of the variable. The parameter will be used to do
+          a case insensitive text search. Multiple parameters can be used.
+        schema:
+          type: array
+          items:
+            type: string
+      - name: source
+        in: query
+        description: Source of the variable. The parameter will be used to do a case
+          insensitive text search. Multiple parameters can be used.
+        schema:
+          type: array
+          items:
+            type: string
+      - name: station
+        in: query
+        description: Name of a SMEAR station. The parameter will be used to do a case
+          insensitive text search. Multiple parameters can be used.
+        schema:
+          type: array
+          items:
+            type: string
+      - name: table
+        in: query
+        description: Name of the database table where variable data is stored in the
+          smear database. Table names can be found from the tablemetadata endpoint.
+          Multiple parameters can be used.
+        schema:
+          type: array
+          items:
+            type: string
+      - name: tablevariable
+        in: query
+        description: Name of a table and a variable separated by a period. Multiple
+          parameters can be used.
+        schema:
+          type: array
+          items:
+            type: string
+        example: HYY_META.Pamb0
+      - name: variable
+        in: query
+        description: Name of a variable in the SMEAR database. Multiple parameters
+          can be used.
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: string
+  /station:
+    get:
+      summary: Fetch general info about the Smart SMEAR stations
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Station'
+  /station/{stationId}:
+    get:
+      summary: Fetch general info about a Smart SMEAR station
+      parameters:
+      - name: stationId
+        in: path
+        description: Id of a station in the SMEAR database.
+        required: true
+        schema:
+          format: int64
+          type: integer
+        example: 1
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Station'
+  /station/{stationId}/table:
+    get:
+      summary: Fetch general info about tables for a Smart SMEAR station
+      parameters:
+      - name: stationId
+        in: path
+        description: Id of a station in the SMEAR database.
+        required: true
+        schema:
+          format: int64
+          type: integer
+        example: 1
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TableMetadata'
+  /station/{stationId}/table/{tableId}:
+    get:
+      summary: Fetch general info about a table for a Smart SMEAR station
+      parameters:
+      - name: stationId
+        in: path
+        description: Id of a station in the SMEAR database.
+        required: true
+        schema:
+          format: int64
+          type: integer
+        example: 1
+      - name: tableId
+        in: path
+        description: Id of a table in the SMEAR database.
+        required: true
+        schema:
+          format: int64
+          type: integer
+        example: 11
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TableMetadata'
+  /station/{stationId}/table/{tableId}/variable:
+    get:
+      summary: Fetch general info about variables in a table for a Smart SMEAR station
+      parameters:
+      - name: stationId
+        in: path
+        description: Id of a station in the SMEAR database.
+        required: true
+        schema:
+          format: int64
+          type: integer
+        example: 1
+      - name: tableId
+        in: path
+        description: Id of a table in the SMEAR database.
+        required: true
+        schema:
+          format: int64
+          type: integer
+        example: 11
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VariableMetadata'
+  /station/{stationId}/table/{tableId}/variable/{variableId}:
+    get:
+      summary: Fetch general info about a variable in a table for a Smart SMEAR station
+      parameters:
+      - name: stationId
+        in: path
+        description: Id of a station in the SMEAR database.
+        required: true
+        schema:
+          format: int64
+          type: integer
+        example: 1
+      - name: tableId
+        in: path
+        description: Id of a table in the SMEAR database.
+        required: true
+        schema:
+          format: int64
+          type: integer
+        example: 11
+      - name: variableId
+        in: path
+        description: Id of a variable in the SMEAR database.
+        required: true
+        schema:
+          format: int64
+          type: integer
+        example: 528
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VariableMetadata'
+  /structure:
+    get:
+      summary: Fetch data for navigation tree on the UI search page
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StationNode'
+components:
+  schemas:
+    CategoryNode:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        variables:
+          type: array
+          items:
+            $ref: '#/components/schemas/VariableNode'
+    Event:
+      type: object
+      properties:
+        description:
+          type: string
+        eventType:
+          type: string
+        id:
+          format: int64
+          type: integer
+        periodEnd:
+          format: date
+          type: string
+        periodStart:
+          format: date
+          type: string
+        timestamp:
+          format: date-time
+          type: string
+    Metadata:
+      type: object
+      properties:
+        accessRights:
+          type: string
+        contact:
+          type: string
+        creator:
+          type: string
+        discipline:
+          type: string
+        maintainingOrganisation:
+          type: string
+        project:
+          type: string
+        ref:
+          type: string
+        rightsCategory:
+          type: string
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type: string
+    Serializable:
+      type: object
+    Station:
+      type: object
+      properties:
+        dcmiPoint:
+          type: string
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+    StationNode:
+      type: object
+      properties:
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryNode'
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+    TableMetadata:
+      type: object
+      properties:
+        id:
+          format: int64
+          type: integer
+        identifier:
+          type: string
+        name:
+          type: string
+        period:
+          format: int64
+          type: integer
+        spatialCoverage:
+          type: string
+        stationId:
+          format: int64
+          type: integer
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type: string
+    Tag:
+      type: object
+      properties:
+        displayKeyword:
+          type: string
+        id:
+          format: int64
+          type: integer
+        name:
+          type: string
+        vocabulary:
+          type: string
+    TimeSeriesSheet:
+      type: object
+      properties:
+        aggregation:
+          type: string
+        aggregationInterval:
+          format: int32
+          type: integer
+        columns:
+          uniqueItems: true
+          type: array
+          items:
+            type: string
+        data:
+          type: array
+          items:
+            type: object
+            additionalProperties: {}
+        endTime:
+          format: date-time
+          type: string
+        recordCount:
+          format: int32
+          type: integer
+        startTime:
+          format: date-time
+          type: string
+    VariableMetadata:
+      type: object
+      properties:
+        category:
+          type: string
+        coverage:
+          format: int32
+          type: integer
+        derivative:
+          type: boolean
+        description:
+          type: string
+        id:
+          format: int64
+          type: integer
+        mandatory:
+          type: boolean
+        name:
+          type: string
+        periodEnd:
+          type: string
+        periodStart:
+          type: string
+        rights:
+          type: string
+        source:
+          type: string
+        tableId:
+          format: int64
+          type: integer
+        tableName:
+          type: string
+        timestamp:
+          format: date-time
+          type: string
+        title:
+          type: string
+        type:
+          type: string
+        uiAvgType:
+          type: string
+        uiSortOrder:
+          format: int32
+          type: integer
+        unit:
+          type: string
+    VariableNode:
+      type: object
+      properties:
+        sortOrder:
+          format: int32
+          type: integer
+        tablevariable:
+          type: string
+        title:
+          type: string
+        variableId:
+          format: int64
+          type: integer
