@@ -1,6 +1,138 @@
 library(testthat)
+library(mockery)
+library(httr)
 
 context("Utility functions")
+
+test_that("get_api_url returns correct URL", {
+  # Save original environment value if it exists
+  original_value <- Sys.getenv("SMEAR_API_URL", unset = NA)
+
+  # Test default URL when env var not set
+  Sys.unsetenv("SMEAR_API_URL")
+  expect_equal(
+    SmartSMEAR:::get_api_url(),
+    "https://smear-backend.2.rahtiapp.fi"
+  )
+
+  # Test custom URL when env var is set
+  test_url <- "https://test-api-url.example.com"
+  Sys.setenv(SMEAR_API_URL = test_url)
+  expect_equal(SmartSMEAR:::get_api_url(), test_url)
+
+  # Restore original environment value
+  if (is.na(original_value)) {
+    Sys.unsetenv("SMEAR_API_URL")
+  } else {
+    Sys.setenv(SMEAR_API_URL = original_value)
+  }
+})
+
+
+test_that("make_api_request handles CSV responses correctly", {
+  # Create mock response for CSV
+  mock_csv <- "column1,column2\nvalue1,value2\nvalue3,value4"
+  mock_response <- structure(
+    list(
+      status_code = 200,
+      headers = list(`content-type` = "text/csv"),
+      content = charToRaw(mock_csv)
+    ),
+    class = "response"
+  )
+
+  mock_df <- data.frame(
+    column1 = c("value1", "value3"),
+    column2 = c("value2", "value4")
+  )
+
+  # Mock functions
+  mock_GET <- mock(mock_response)
+  mock_http_error <- mock(FALSE)
+  mock_content <- mock(mock_csv)
+
+  with_mock(
+    "httr::GET" = mock_GET,
+    "httr::http_error" = mock_http_error,
+    "httr::content" = mock_content,
+    {
+      result <- SmartSMEAR:::make_api_request(
+        "https://test-url.com",
+        format = "csv"
+      )
+      expect_true(is.data.frame(result))
+      expect_equal(nrow(result), 2)
+      expect_equal(ncol(result), 2)
+    }
+  )
+})
+
+test_that("make_api_request handles TSV responses correctly", {
+  # Create mock response for TSV
+  mock_tsv <- "column1\tcolumn2\nvalue1\tvalue2\nvalue3\tvalue4"
+  mock_response <- structure(
+    list(
+      status_code = 200,
+      headers = list(`content-type` = "text/plain"),
+      content = charToRaw(mock_tsv)
+    ),
+    class = "response"
+  )
+
+  mock_df <- data.frame(
+    column1 = c("value1", "value3"),
+    column2 = c("value2", "value4")
+  )
+
+  # Mock functions
+  mock_GET <- mock(mock_response)
+  mock_http_error <- mock(FALSE)
+  mock_content <- mock(mock_tsv)
+
+  with_mock(
+    "httr::GET" = mock_GET,
+    "httr::http_error" = mock_http_error,
+    "httr::content" = mock_content,
+    {
+      result <- SmartSMEAR:::make_api_request(
+        "https://test-url.com",
+        format = "tsv"
+      )
+      expect_true(is.data.frame(result))
+      expect_equal(nrow(result), 2)
+      expect_equal(ncol(result), 2)
+    }
+  )
+})
+
+
+test_that("make_query_list creates the correct list structure", {
+  # Test with single variable
+  result <- SmartSMEAR:::make_query_list(
+    "tablevariable",
+    "HYY_META.temperature"
+  )
+  expect_equal(length(result), 1)
+  expect_equal(names(result), "tablevariable")
+  expect_equal(result$tablevariable, "HYY_META.temperature")
+
+  # Test with multiple variables
+  vars <- c("HYY_META.temperature", "HYY_META.humidity", "HYY_META.pressure")
+  result <- SmartSMEAR:::make_query_list("tablevariable", vars)
+  expect_equal(length(result), 3)
+  expect_equal(names(result), rep("tablevariable", 3))
+  expect_equal(unname(unlist(result)), vars)
+
+  # Test with different key name
+  result <- SmartSMEAR:::make_query_list("variable", c("temp", "humid"))
+  expect_equal(length(result), 2)
+  expect_equal(names(result), rep("variable", 2))
+  expect_equal(unname(unlist(result)), c("temp", "humid"))
+
+  # Test with empty variables list
+  result <- SmartSMEAR:::make_query_list("tablevariable", character(0))
+  expect_equal(length(result), 0)
+})
 
 describe("add_params", {
   test_that("add_params handles NULL and non-NULL values correctly", {
