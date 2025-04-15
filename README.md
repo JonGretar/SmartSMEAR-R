@@ -1,6 +1,8 @@
 # SmartSMEAR
 
-An R package for accessing SmartSMEAR API data. SmartSMEAR is a data visualization and download tool for atmospheric, flux, soil, tree physiological, and water quality measurements from SMEAR research stations of the University of Helsinki and the University of Eastern Finland.
+An R package for accessing [SmartSMEAR](https://smear.avaa.csc.fi/) API data.
+
+SmartSMEAR is a data visualization and download tool for atmospheric, flux, soil, tree physiological, and water quality measurements from SMEAR research stations of the [University of Helsinki](https://helsinki.fi) and the [University of Eastern Finland](https://uef.fi).
 
 ## Installation
 
@@ -147,7 +149,7 @@ daily_avg <- data %>%
 ## API Documentation
 
 Full API documentation is available at:
-https://smear-backend.rahtiapp.fi/swagger-ui/
+https://smear-backend.2.rahtiapp.fi/q/openapi-ui/
 
 ## License
 
