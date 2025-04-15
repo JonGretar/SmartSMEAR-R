@@ -153,3 +153,28 @@ get_timeseries <- function(
 
   return(result)
 }
+
+
+#' Clean column names by removing table prefixes
+#' @param df Data frame with column names to clean
+#' @return Data frame with cleaned column names
+#' @export
+clear_column_prefix <- function(df) {
+  # Get current column names
+  col_names <- colnames(df)
+
+  # For each column name containing a dot, extract the part after the last dot
+  new_names <- sapply(col_names, function(x) {
+    if (grepl("\\.", x)) {
+      # Split by dot and take the last element
+      tail(strsplit(x, "\\.")[[1]], 1)
+    } else {
+      x # Return unchanged if no dot
+    }
+  })
+
+  # Assign new column names
+  colnames(df) <- new_names
+
+  df
+}
