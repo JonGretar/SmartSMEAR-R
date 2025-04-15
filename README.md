@@ -15,10 +15,10 @@ devtools::install_github("JonGretar/SmartSMEAR-R")
 library(SmartSMEAR)
 
 # Get list of all stations
-stations <- get_stations()
+stations <- search_stations()
 
 # Get metadata for a specific measurement table
-hyytiala_meta <- get_table_metadata("HYY_META")
+hyytiala_meta <- search_tables("HYY_META")
 
 # Search for specific variables
 par_vars <- search_variables(description = "PAR")
@@ -33,13 +33,13 @@ data <- get_timeseries(
 
 # Result has a 'time' column in POSIXct format:
 head(data)
-#                    time    PAR
-# 1 2023-01-01 00:00:00   0.00
-# 2 2023-01-01 00:01:00   0.00
-# 3 2023-01-01 00:02:00   0.00
-# 4 2023-01-01 00:03:00   0.00
-# 5 2023-01-01 00:04:00   0.00
-# 6 2023-01-01 00:05:00   0.00
+#                    time    HYY_META.PAR  HYY_META.PAR2 HYY_META.NDVI
+# 1 2023-01-01 00:00:00   0.00      0.00     0.00
+# 2 2023-01-01 00:01:00   0.00      0.00     0.00
+# 3 2023-01-01 00:02:00   0.00      0.00     0.00
+# 4 2023-01-01 00:03:00   0.00      0.00     0.00
+# 5 2023-01-01 00:04:00   0.00      0.00     0.00
+# 6 2023-01-01 00:05:00   0.00      0.00     0.00
 ```
 
 ## Data Timing and Resolution
@@ -78,13 +78,13 @@ hourly_data <- get_timeseries(
 )
 
 head(hourly_data)
-#                    time    PAR
-# 1 2023-01-01 00:00:00   0.00
-# 2 2023-01-01 01:00:00   0.00
-# 3 2023-01-01 02:00:00   0.00
-# 4 2023-01-01 03:00:00   0.00
-# 5 2023-01-01 04:00:00   0.00
-# 6 2023-01-01 05:00:00   0.00
+#                    time    HYY_META.PAR  HYY_META.PAR2 HYY_META.NDVI
+# 1 2023-01-01 00:00:00   0.00      0.00     0.00
+# 2 2023-01-01 00:01:00   0.00      0.00     0.00
+# 3 2023-01-01 00:02:00   0.00      0.00     0.00
+# 4 2023-01-01 00:03:00   0.00      0.00     0.00
+# 5 2023-01-01 00:04:00   0.00      0.00     0.00
+# 6 2023-01-01 00:05:00   0.00      0.00     0.00
 ```
 
 ## Working with Time Data
