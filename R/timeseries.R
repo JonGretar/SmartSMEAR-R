@@ -181,7 +181,6 @@ clear_column_prefix <- function(df) {
 
 #' Merge columns with device suffixes and optionally record device used
 #' @param df Data frame with device-suffixed columns
-#' @param device_suffixes Vector of device suffixes (e.g., c("_LI70", "_LI72"))
 #' @param record_device Logical, whether to create additional columns recording which device was used
 #' @return Data frame with merged columns and optionally device information
 #' @export

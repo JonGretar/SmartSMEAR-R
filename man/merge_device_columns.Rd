@@ -10,8 +10,6 @@ merge_device_columns(df, record_device = TRUE)
 \item{df}{Data frame with device-suffixed columns}
 
 \item{record_device}{Logical, whether to create additional columns recording which device was used}
-
-\item{device_suffixes}{Vector of device suffixes (e.g., c("_LI70", "_LI72"))}
 }
 \value{
 Data frame with merged columns and optionally device information
