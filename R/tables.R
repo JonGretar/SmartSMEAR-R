@@ -8,7 +8,7 @@
 #' @return A data frame containing table metadata. When a specific table is requested,
 #'         includes detailed information about that table's structure and variables.
 #' @export
-get_table_metadata <- function(table_name = NULL) {
+search_tables <- function(table_name = NULL) {
   # Build URL
   api_url <- get_api_url()
 
@@ -23,14 +23,4 @@ get_table_metadata <- function(table_name = NULL) {
 
   # Make request and return results
   make_api_request(url, params = list(), format = "json")
-}
-
-#' Get All SMEAR Tables
-#'
-#' Convenience function to get a list of all available SMEAR tables
-#'
-#' @return A data frame containing information about all tables
-#' @export
-get_tables <- function() {
-  get_table_metadata()
 }
