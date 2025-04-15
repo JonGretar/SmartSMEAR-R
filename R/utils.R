@@ -140,6 +140,6 @@ add_params <- function(params, new_params) {
 #' @keywords internal
 make_query_list <- function(keyname, variables) {
   params <- rep(keyname, length(variables))
-  query_list <- setNames(as.list(variables), params)
+  query_list <- stats::setNames(as.list(variables), params)
   query_list
 }

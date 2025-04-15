@@ -167,7 +167,7 @@ clear_column_prefix <- function(df) {
   new_names <- sapply(col_names, function(x) {
     if (grepl("\\.", x)) {
       # Split by dot and take the last element
-      tail(strsplit(x, "\\.")[[1]], 1)
+      utils::tail(strsplit(x, "\\.")[[1]], 1)
     } else {
       x # Return unchanged if no dot
     }
