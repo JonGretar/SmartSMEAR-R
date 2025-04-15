@@ -2,6 +2,7 @@
 
 export(clear_column_prefix)
 export(get_timeseries)
+export(merge_device_columns)
 export(search_stations)
 export(search_tables)
 export(search_variables)

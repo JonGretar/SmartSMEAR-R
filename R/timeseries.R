@@ -178,3 +178,72 @@ clear_column_prefix <- function(df) {
 
   df
 }
+
+#' Merge columns with device suffixes and optionally record device used
+#' @param df Data frame with device-suffixed columns
+#' @param device_suffixes Vector of device suffixes (e.g., c("_LI70", "_LI72"))
+#' @param record_device Logical, whether to create additional columns recording which device was used
+#' @return Data frame with merged columns and optionally device information
+#' @export
+merge_device_columns <- function(df, record_device = TRUE) {
+  device_suffixes <- c("_PIC", "_LI77", "_LI72", "_LI70", "_LGR")
+
+  # Get all column names
+  col_names <- colnames(df)
+
+  # Find base variable names (without device suffix)
+  base_vars <- unique(unlist(lapply(device_suffixes, function(suffix) {
+    # Find columns ending with this suffix
+    cols_with_suffix <- col_names[grepl(paste0(suffix, "$"), col_names)]
+    # Remove suffix to get base names
+    gsub(suffix, "", cols_with_suffix)
+  })))
+
+  # Create new dataframe to store results
+  result_df <- df
+
+  # Process each base variable
+  for (base_var in base_vars) {
+    # Find all columns for this base variable
+    device_cols <- c()
+    for (suffix in device_suffixes) {
+      col_name <- paste0(base_var, suffix)
+      if (col_name %in% col_names) {
+        device_cols <- c(device_cols, col_name)
+      }
+    }
+
+    if (length(device_cols) > 0) {
+      # Create new merged column
+      merged_values <- Reduce(
+        function(x, y) ifelse(is.na(x), y, x),
+        lapply(device_cols, function(col) df[[col]])
+      )
+      result_df[[base_var]] <- merged_values
+
+      # Record which device was used (if requested)
+      if (record_device) {
+        device_col_name <- paste0(base_var, "_device")
+        result_df[[device_col_name]] <- NA_character_
+
+        # For each row, find which device column had the non-NA value
+        for (i in seq_len(nrow(df))) {
+          for (col in device_cols) {
+            if (!is.na(df[i, col])) {
+              # Extract device suffix and remove leading underscore
+              device <- sub(".*(_.*)", "\\1", col)
+              device <- sub("^_", "", device)
+              result_df[i, device_col_name] <- device
+              break
+            }
+          }
+        }
+      }
+
+      # Remove original device-specific columns
+      result_df <- result_df[, !colnames(result_df) %in% device_cols]
+    }
+  }
+
+  return(result_df)
+}

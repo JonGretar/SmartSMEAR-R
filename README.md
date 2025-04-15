@@ -87,6 +87,45 @@ head(hourly_data)
 # 6 2023-01-01 00:05:00   0.00      0.00     0.00
 ```
 
+## Cleanup functions
+
+There are a few convenience related functions available. `clear_column_prefix`
+remove the table prefixes from the column names.
+
+Note that it does not do any checks of duplicity. So if a dataframes has both
+"SII1_EDDY.F_c_LI72" and "SII2_EDDY.F_c_LI72" it will result in loss of data.
+
+```R
+hyy_df <- get_timeseries(
+  variables = c("SII1_EDDY.NEE","SII1_EDDY.F_c_LI72", "SII1_EDDY.F_c_LI70"),
+  start_time = "2023-01-01 00:00:00", end_time = "2023-01-02 00:00:00"
+)
+#    time                   SII1_EDDY.F_c_LI72 SII1_EDDY.F_c_LI70 SII1_EDDY.NEE
+# 1  2023-01-01 00:00:00            0.25421                NaN       0.25421
+# 2  2023-01-01 00:30:00            NaN                0.22673       0.21579
+# 3  2023-01-01 01:00:00           -0.19346                NaN      -0.20133
+
+hyy_df <- clear_column_prefix(hyy_df)
+#                   time   F_c_LI72   F_c_LI70   NEE
+# 1  2023-01-01 00:00:00   0.25421    NaN        0.25421
+# 2  2023-01-01 00:30:00   NaN        0.22673    0.21579
+# 3  2023-01-01 01:00:00   -0.19346   NaN        -0.20133
+```
+
+Another helper function is `merge_device_columns` which looks for columns ending
+with `c("_PIC", "_LI77", "_LI72", "_LI70", "_LGR")` and merges into a single
+column. For value it uses the first non-NaN value it finds.
+
+Optionally it saves the device whose value was used in the \_device postfix.
+
+```R
+merge_device_columns(hyy_df, record_device = TRUE)
+#                   time      NEE      F_c F_c_device
+# 1  2023-01-01 00:00:00  0.25421  0.25421       LI72
+# 2  2023-01-01 00:30:00  0.21579  0.22673       LI70
+# 3  2023-01-01 01:00:00 -0.20133 -0.19346       LI72
+```
+
 ## Working with Time Data
 
 The time series data is returned with a `time` column that is already in POSIXct format with the correct timezone (EET). This makes it easy to use with time series analysis packages and plotting libraries:
