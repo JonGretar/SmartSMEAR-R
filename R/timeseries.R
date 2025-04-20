@@ -3,13 +3,16 @@
 #' Fetch time series data for specified variables within a time range
 #'
 #' @param variables Character vector of table.variable combinations
-#' @param start_time Start time as character in format "YYYY-MM-DD HH:MM:SS" or POSIXt object
-#' @param end_time End time as character in format "YYYY-MM-DD HH:MM:SS" or POSIXt object
+#' @param start_time Start time as character in format "YYYY-MM-DD HH:MM:SS" or
+#'                   POSIXt object
+#' @param end_time End time as character in format "YYYY-MM-DD HH:MM:SS" or
+#'                 POSIXt object
 #' @param interval Optional aggregation interval (1-60 minutes)
 #' @param aggregation Aggregation method (NONE, ARITHMETIC, GEOMETRIC, etc.)
 #' @param quality Optional quality flag filter
 #' @param processing_level Processing level filter (ANY or CHECKED)
-#' @return A data frame containing the time series data with a 'time' column in POSIXct format
+#' @return A data frame containing the time series data with a 'time' column in
+#'         POSIXct format
 #' @export
 get_timeseries <- function(
   variables,
@@ -181,7 +184,8 @@ clear_column_prefix <- function(df) {
 
 #' Merge columns with device suffixes and optionally record device used
 #' @param df Data frame with device-suffixed columns
-#' @param record_device Logical, whether to create additional columns recording which device was used
+#' @param record_device Logical, whether to create additional columns recording
+#'                      which device was used
 #' @return Data frame with merged columns and optionally device information
 #' @export
 merge_device_columns <- function(df, record_device = TRUE) {

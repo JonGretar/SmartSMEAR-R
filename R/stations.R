@@ -3,8 +3,10 @@
 #' Get information about SMEAR measurement stations
 #'
 #' @param station Optional station name to filter results (e.g., "HYY")
-#' @param name Optional station's human readable name to filter results (e.g., "Hyytiälä")
-#' @return A data frame containing station information including id, name, location, and other metadata
+#' @param name Optional station's human readable name to filter results (e.g.,
+#'             "Hyytiälä")
+#' @return A data frame containing station information including id, name,
+#'         location, and other metadata
 #' @export
 search_stations <- function(station = NULL, name = NULL) {
   # Build query parameters
@@ -32,7 +34,8 @@ search_stations <- function(station = NULL, name = NULL) {
 #' This function parses the dcmiPoint string from station data to extract
 #' coordinates and elevation information into separate columns
 #'
-#' @param stations A data frame containing SMEAR station information with a dcmiPoint column
+#' @param stations A data frame containing SMEAR station information with a
+#'                 dcmiPoint column
 #' @return A data frame with added east, north, and elevation columns
 #' @keywords internal
 parse_station_coordinates <- function(stations) {

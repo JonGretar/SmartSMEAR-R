@@ -1,12 +1,13 @@
 #' Get SMEAR Table Metadata
 #'
-#' Get metadata for SMEAR data tables. If table_name is provided, returns detailed
-#' metadata for that specific table. If no table_name is provided, returns a list
-#' of all available tables.
+#' Get metadata for SMEAR data tables. If table_name is provided, returns
+#' detailed metadata for that specific table. If no table_name is provided,
+#' returns a list of all available tables.
 #'
 #' @param table_name Optional table name (e.g., "HYY_META")
-#' @return A data frame containing table metadata. When a specific table is requested,
-#'         includes detailed information about that table's structure and variables.
+#' @return A data frame containing table metadata. When a specific table is
+#'         requested, includes detailed information about that table's structure
+#'         and variables.
 #' @export
 search_tables <- function(table_name = NULL) {
   # Build URL
